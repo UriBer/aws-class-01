@@ -27,7 +27,7 @@ def get_ip():
 def get_temp(temp):
 
     response = get_ip_meta()
-    my_ses = boto3.Session()
+    my_ses = boto3.Session(region_name = 'us-east-1')
     dynamodb = my_ses.resource('dynamodb')
     table = dynamodb.Table('eb_try_logger')
 
@@ -39,13 +39,15 @@ def get_temp(temp):
     'ip_meta' : response, # res_data
     'name':'chilkibilki'
     }
+    
     print(item)
     table.put_item(Item=item)
     return Response(json.dumps(item), mimetype='application/json', status=200)
 
 @application.route('/bi', methods=['GET'])
 def get_bi():
-    dynamodb = boto3.resource('dynamodb')
+    my_ses = boto3.Session(region_name = 'us-east-1')
+    dynamodb = my_ses.resource('dynamodb')
     table = dynamodb.Table('eb_try_logger')
     resp = table.scan()
 
