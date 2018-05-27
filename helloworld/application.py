@@ -5,7 +5,6 @@ import json
 from flask import Flask, Response, render_template, request
 from helloworld.flaskrun import flaskrun
 import requests
-
 import boto3
 import datetime
 
@@ -22,12 +21,15 @@ def get_ip():
     # return time and path to url to database
     return Response(json.dumps(get_ip_meta()), mimetype='application/json', status=200)
 
-@application.route('/temp/<temp>', methods=['GET'])
+@application.route('/temp/<temp>', methods=['POST'])
 def get_temp(temp):
-
+    # get ip metadata from the fuction
     response = get_ip_meta()
+    # create a session for boto to access the credentials that the ec2 holds
     my_ses = boto3.Session(region_name = 'us-east-1')
+    # connect to the resource dynmodb using the session
     dynamodb = my_ses.resource('dynamodb')
+    # refer to the table
     table = dynamodb.Table('eb_try_logger')
 
     item={
@@ -40,7 +42,9 @@ def get_temp(temp):
     }
     
     print(item)
+    # insert the item
     table.put_item(Item=item)
+    
     return Response(json.dumps(item), mimetype='application/json', status=200)
 
 @application.route('/bi', methods=['GET'])
@@ -49,7 +53,8 @@ def get_bi():
     dynamodb = my_ses.resource('dynamodb')
     table = dynamodb.Table('eb_try_logger')
     resp = table.scan()
-
+    for item in resp:
+        print(item)
     #return Response(json.dumps(str(resp)), mimetype='application/json', status=200)
     return render_template('index.html', response=str(resp), title='bi')
 
