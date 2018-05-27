@@ -1,7 +1,6 @@
 #!flask/bin/python
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(sys.path[0])))
-
 import json
 from flask import Flask, Response, render_template, request
 from helloworld.flaskrun import flaskrun
@@ -10,7 +9,7 @@ import requests
 import boto3
 import datetime
 
-application = Flask(__name__)
+application = Flask(__name__, template_folder='templates')
 
 @application.route('/', methods=['GET'])
 def get():
