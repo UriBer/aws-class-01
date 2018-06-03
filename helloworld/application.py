@@ -7,6 +7,7 @@ from helloworld.flaskrun import flaskrun
 import requests
 import boto3 
 from boto3.dynamodb.conditions import Key
+from helloworld.setmetadata import db_set_item
 
 import datetime
 
@@ -27,8 +28,9 @@ def get_ip():
 def get_temp(site):
     # get ip metadata from the fuction
     response = get_ip_meta()
-    
+    # get json data from the post body
     post_data = request.get_json()
+    # build request data
     Item = build_request_data(site, post_data, response)
     db_set_item('eb_try_logger', Item)
     
@@ -134,7 +136,7 @@ def build_request_data(site, post_data, response):
     
     return Item
 
-
+'''
 def db_set_item(table, item):
         # create a session for boto to access the credentials that the ec2 holds
     my_ses = boto3.Session(region_name = 'us-east-1')
@@ -146,7 +148,7 @@ def db_set_item(table, item):
     print(item)
     # insert the item
     table.put_item(Item=item)
-
+'''
 
 if __name__ == '__main__':
     flaskrun(application)
