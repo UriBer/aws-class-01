@@ -7,7 +7,7 @@ from helloworld.flaskrun import flaskrun
 import requests
 import boto3 
 from boto3.dynamodb.conditions import Key
-from helloworld.setmetadata import db_set_item
+from helloworld.setmetadata import db_set_item, inc_page_by
 
 import datetime
 
@@ -33,6 +33,7 @@ def get_temp(site):
     # build request data
     Item = build_request_data(site, post_data, response)
     db_set_item('eb_try_logger', Item)
+    # inc_page_by(response['country'], site)
     
     return Response(json.dumps(Item), mimetype='application/json', status=200)
 
@@ -58,35 +59,37 @@ def get_bi_site(db_key, db_value):
     else:
         # when result not found, return table (presevent error handling in code...)
         resp = table.scan()
-
+    # count the number of items in resp dict   
+    obj_len = len(resp['Items'])
+    print(type(resp['Items']))
+    '''
+    print('item count: ',str(obj_len))
     for item in resp['Items']:
         print(item['site'])
-    '''
+    
     res = []
     res = json.loads(resp['Items'][0])
     '''
     #return Response(json.dumps(str(resp['Items'])), mimetype='application/json', status=200)
     #return render_template('index.html', response=json.dumps(resp['Items']), title='bi')
-    return render_template('index.html', response=json.dumps(resp), title='bi')
+    return render_template('index.html', response=resp['Items'], counter=obj_len, title='bi')
 
 
 @application.route('/bi/graph')
 def showgraph():
     data_provider = [
         {
-            'category': 'סחוג',
-            'column-1': 8,
-            'column-2': 5
+            'category': 'אתר 1',
+            'column-1': 8
+
         },
         {
-            "category": "עמבה",
-            "column-1": 6,
-            "column-2": 7
+            "category": "אתר 2",
+            "column-1": 6
         },
         {
-            "category": "סחוג עם עמבה",
-            "column-1": 2,
-            "column-2": 3
+            "category": "אתר 3",
+            "column-1": 2
         }
     ]
     return render_template('bi_graph.html', data=data_provider, chart_title='מה המצב אחי')
@@ -136,19 +139,6 @@ def build_request_data(site, post_data, response):
     
     return Item
 
-'''
-def db_set_item(table, item):
-        # create a session for boto to access the credentials that the ec2 holds
-    my_ses = boto3.Session(region_name = 'us-east-1')
-    # connect to the resource dynmodb using the session
-    dynamodb = my_ses.resource('dynamodb')
-    # refer to the table
-    table = dynamodb.Table(table)
-
-    print(item)
-    # insert the item
-    table.put_item(Item=item)
-'''
 
 if __name__ == '__main__':
     flaskrun(application)
