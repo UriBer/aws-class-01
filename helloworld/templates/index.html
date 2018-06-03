@@ -4,6 +4,9 @@
             <title>mylogger - {{ title }}</title>
         </head>
         <body>
-            <p>your address details are: {{ response }}</p>
+            <p>your address details are: {{ response|safe }}</p>
+
+        
+            
         </body>
 </html>
