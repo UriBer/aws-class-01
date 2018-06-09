@@ -8,7 +8,7 @@ import requests
 import boto3 
 from boto3.dynamodb.conditions import Key
 from helloworld.setmetadata import db_set_item, inc_page_by
-
+import io
 import datetime
 
 application = Flask(__name__, template_folder='templates')
@@ -37,6 +37,38 @@ def get_temp(site):
     
     return Response(json.dumps(Item), mimetype='application/json', status=200)
 
+#@application.route('/upload/<bucket>/<file_name>', methods=['POST'])
+@application.route('/upload/', methods=['GET','POST'])
+#def upload_s3(bucket, file_name):
+def upload_s3():
+    # if get show page for upload
+    if request.method == 'GET':
+        return render_template('make_my_day.html')
+
+    # if post than
+    # get post metadata
+    response = request.get_json() 
+    print(response)
+    bucket = response['bucket'] # 'loggereast1'
+    file_name = response['file_name'] # 'miao_chao.txt'
+    file_data = response['file_data']
+    # init s3 resource
+    s3 = boto3.resource('s3', region_name = 'us-east-1')
+    s3.Bucket(bucket).put_object(Key=file_name, Body=file_data)
+
+    return Response(json.dumps({'uploaded': file_name }), mimetype='application/json', status=200)
+
+'''
+    if request.files:
+        file = request.form.get("user_file")
+        s3.Bucket(bucket).put_object(Key=file_name, Body=file)
+    # deal with 
+    else:
+'''    
+    #data = io.BytesIO(b"{'chilki':'bilki'}")#open('test.txt', 'rb') 
+    #data = open('/home/ec2-user/environment/aws-class-01/helloworld/test.txt', 'rb')
+
+    
 @application.route('/bi', methods=['GET'])
 def get_bi():
     my_ses = boto3.Session(region_name = 'us-east-1')
