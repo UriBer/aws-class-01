@@ -1,1 +1,2 @@
-curl -d "{'bucket':'loggereast1', 'file_name':'welcome_bilki', 'file_data':'the dark side of the moon'}" -H Content-Type: application/json http://localhost:5000/upload/
+curl -d '{"bucket":"loggereast1", "file_name":"welcome_bilki", "file_data":"the dark side of the moon"}' -H 'Content-Type: application/json' http://localhost:5000/upload/
+curl -F 'user_file=@/home/ec2-user/environment/aws-class-01/helloworld/test.txt' http://localhost:5000/upload/

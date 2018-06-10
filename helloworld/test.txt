@@ -1,1 +1,1 @@
-{'log': 'testing our log'}
+{'log': 'testing our log', 'is_good':'oh ye'}
