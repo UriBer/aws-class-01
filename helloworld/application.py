@@ -11,7 +11,6 @@ from helloworld.setmetadata import db_set_item, inc_page_by
 import io
 import datetime
 
-from werkzeug.utils import secure_filename
 
 application = Flask(__name__, template_folder='templates')
 
