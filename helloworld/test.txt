@@ -1,1 +1,1 @@
-{'log': 'testing our log', 'is_good':'oh ye'}
+{"bucket":"loggereast1", "file_name":"stats", "country": "us", "page": "exam", "hits":"6500"}

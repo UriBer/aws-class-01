@@ -59,9 +59,11 @@ def upload_s3():
         response = request.get_json() 
         print(response)
         bucket = response['bucket'] # 'loggereast1'
-        file_name = response['file_name'] # 'miao_chao.txt'
-        file_data = response['file_data']
-        s3.Bucket(bucket).put_object(Key=file_name, Body=file_data)
+        file_name = response['file_name'] # whatever name
+        country = response['country']
+        data = json.dumps(response)
+        # to create a file the obdy needs to be of type bytes, hence the data.encode
+        s3.Bucket(bucket).put_object(Key=file_name, Body=data.encode('utf-8'))
 
     return Response(json.dumps({'uploaded': file_name }), mimetype='application/json', status=200)
 
