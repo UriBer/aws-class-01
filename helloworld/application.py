@@ -8,9 +8,7 @@ import requests
 import boto3 
 from boto3.dynamodb.conditions import Key
 from helloworld.setmetadata import db_set_item, inc_page_by
-import io
 import datetime
-
 from werkzeug.utils import secure_filename
 
 application = Flask(__name__, template_folder='templates')
@@ -45,7 +43,7 @@ def upload_s3():
     
     bucket = 'loggereast1'
     file_name = 'temp.txt'
-    
+    time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     # if get show page for upload
     if request.method == 'GET':
         return render_template('make_my_day.html')
@@ -53,13 +51,13 @@ def upload_s3():
     s3 = boto3.resource('s3', region_name = 'us-east-1')
     if request.files:
         file = request.files['user_file']
-        file_name = secure_filename(file.filename)
+        file_name = secure_filename(file.filename) + time
         s3.Bucket(bucket).put_object(Key=file_name, Body=file)
     else:  
         response = request.get_json() 
         print(response)
         bucket = response['bucket'] # 'loggereast1'
-        file_name = response['file_name'] # whatever name
+        file_name = response['file_name'] + time # whatever name
         country = response['country']
         data = json.dumps(response)
         # to create a file the obdy needs to be of type bytes, hence the data.encode
