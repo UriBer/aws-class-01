@@ -38,7 +38,7 @@ def get_temp(site):
     return Response(json.dumps(Item), mimetype='application/json', status=200)
 
 
-@application.route('/upload/', methods=['GET','POST'])
+@application.route('/upload', methods=['GET','POST'])
 def upload_s3():
     
     bucket = 'loggereast1'
@@ -126,6 +126,42 @@ def showgraph():
 @application.route('/', methods=['POST'])
 def post():
     return Response(json.dumps({'Output': 'Hello World'}), mimetype='application/json', status=200)
+
+
+@application.route('/analyze/<bucket>/<image>', methods=['GET'])
+def analyze(bucket='loggereast1', image='dinner1'):
+    return detect_labels(bucket, image)
+    
+    
+def detect_labels(bucket, key, max_labels=10, min_confidence=50, region="us-east-1"):
+    rekognition = boto3.client("rekognition", region)
+    s3 = boto3.resource('s3', region_name = 'us-east-1')
+    
+    image = s3.Object(bucket, key) # Get an Image from S3
+    img_data = image.get()['Body'].read() # Read the image
+
+    response = rekognition.detect_labels(
+        Image={
+            'Bytes': img_data
+        },
+        MaxLabels=max_labels,
+		MinConfidence=min_confidence,
+    )
+    
+    return json.dumps(response['Labels'])
+    
+    '''
+	response = rekognition.detect_labels(
+		Image={
+			"S3Object": {
+				"Bucket": bucket,
+				"Name": key,
+			}
+		},
+		MaxLabels=max_labels,
+		MinConfidence=min_confidence,
+	)
+	'''
 
 
 def options():
