@@ -62,9 +62,10 @@ def upload_s3():
         data = json.dumps(response)
         # to create a file the obdy needs to be of type bytes, hence the data.encode
         s3.Bucket(bucket).put_object(Key=file_name, Body=data.encode('utf-8'))
-        
+
+    return Response(detect_labels(bucket, file_name), mimetype='application/json', status=200)
     #return Response(json.dumps({'uploaded': file_name }), mimetype='application/json', status=200)
-    return detect_labels('loggereast1', file_name)
+
     
 @application.route('/bi', methods=['GET'])
 def get_bi():
