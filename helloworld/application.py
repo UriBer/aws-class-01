@@ -37,6 +37,20 @@ def get_temp(site):
     
     return Response(json.dumps(Item), mimetype='application/json', status=200)
 
+@application.route('/iter/<bucket>', methods=['GET'])
+def iterate_bucket_items(bucket):
+    # the result of the authentication
+    result = {'is_auth':'false'}
+    
+    s3 = boto3.resource('s3', region_name = 'us-east-1')
+    my_bucket = s3.Bucket(bucket)
+    for obj in my_bucket.objects.all():
+        print('do your compare here, send the obj.key and bucket name to the compare')
+        print(obj.key)
+
+    return Response(json.dumps(result), mimetype='application/json', status=200)
+
+
 
 @application.route('/upload', methods=['GET','POST'])
 def upload_s3():
@@ -164,6 +178,31 @@ def detect_labels(bucket, key, max_labels=10, min_confidence=50, region="us-east
 	)
 	'''
 
+@application.route('/comp_face/<source_image>/<target_image>', methods=['GET'])
+def compare_face(source_image, target_image):
+    # change region and bucket accordingly
+    region = 'us-east-2'
+    bucket_name = 'your bucket name'
+	
+    rekognition = boto3.client("rekognition", region)
+    response = rekognition.compare_faces(
+        SourceImage={
+    		"S3Object": {
+    			"Bucket": bucket_name,
+    			"Name":source_image,
+    		}
+    	},
+    	TargetImage={
+    		"S3Object": {
+    			"Bucket": bucket_name,
+    			"Name": target_image,
+    		}
+    	},
+		# play with the minimum level of similarity
+        SimilarityThreshold=50,
+    )
+    # return 0 if below similarity threshold
+    return json.dumps(response['FaceMatches'] if response['FaceMatches'] != [] else [{"Similarity": 0.0}])
 
 def options():
     my_list = ["one", "two"]
